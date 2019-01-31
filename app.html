@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+  <head>
+
+ <!-- jQuery library --> 
+ <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    
+ <!-- Latest compiled and minified Bootstrap JavaScript -->
+ <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+ <!-- Latest compiled and minified D3 JavaScript -->
+ <script src="https://d3js.org/d3.v4.min.js"></script>
+
+ <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+ <link rel="stylesheet" href="https://unpkg.com/leaflet@1.2.0/dist/leaflet.css" />
+ 
+ <script src="https://unpkg.com/leaflet@1.2.0/dist/leaflet.js"></script>
+ <script type="text/javascript" src="https://stamen-maps.a.ssl.fastly.net/js/tile.stamen.js"></script>
+ <script src="https://d3js.org/topojson.v1.min.js"></script>   
+ 
+ <script src="https://leaflet.github.io/Leaflet.markercluster/dist/leaflet.markercluster-src.js"></script>
+ 
+ <link rel="stylesheet" href="https://leaflet.github.io/Leaflet.markercluster/dist/MarkerCluster.css" />
+ <link rel="stylesheet" href="https://leaflet.github.io/Leaflet.markercluster/dist/MarkerCluster.Default.css" />
+
+
+  
+  
+  </head>
+
+ 
+  <body>
+
+
+
+     <h1>Map Project</h1>
+     
+ <!-- Map size -->   
+<div id="map" style="width: 1600px; height: 1000px; border: 1px solid #AAA;"></div>
+<script>
+
+ <!-- Set starting posistion and level of zoom for the map-->
+var map = L.map( 'map', {
+  center: [10.0, 5.0],
+  minZoom: 2,
+  zoom: 2
+});
+ 
+  <!-- Set map style -->
+L.tileLayer( 'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+ attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+ subdomains: ['a','b','c']
+}).addTo( map );
+
+
+ <!-- In this example three diffent types of icon will be used on the map depenting on the value of 'Payments' -->
+var hIcon = L.icon({
+    iconUrl: '###Link to icon hosted on Google Drive####',
+
+    iconSize:     [90, 90], // size of the icon
+    iconAnchor:   [0, 0], // point of the icon which will correspond to marker's location
+    popupAnchor:  [-3, -76] // point from which the popup should open relative to the iconAnchor
+});
+
+
+var mIcon = L.icon({
+    iconUrl: '###Link to icon hosted on Google Drive####', 
+
+    iconSize:     [29, 71], // size of the icon
+    iconAnchor:   [0, 0], // point of the icon which will correspond to marker's location
+    popupAnchor:  [-3, -76] // point from which the popup should open relative to the iconAnchor
+});
+
+var lIcon = L.icon({
+    iconUrl: '###Link to icon hosted on Google Drive####', 
+
+    iconSize:     [19, 48], // size of the icon
+    iconAnchor:   [0, 0], // point of the icon which will correspond to marker's location
+    popupAnchor:  [-3, -76] // point from which the popup should open relative to the iconAnchor
+});
+
+     <!-- Load data from google sheet using google script to convert it to json format  -->     
+ var code_json =  JSON.parse(<?= json ?>) ;
+
+  <!-- Use clustering to group individual points -->
+var markerClusters = L.markerClusterGroup();
+
+for ( var i=0; i < code_json.length; ++i ) 
+{ 
+ <!-- Set popup text for map icons .Rev_Name, .Payments etc are column headings in the original datafile -->
+ var popup = '<h3>' + code_json[i].Rev_Name + '</h3><br><b> Payments: </b>' +   code_json[i].Payments  + '<br><b> Average Payment: </b>' +   code_json[i].Average_Payment + '<br><b> Total Value: </b>' +   code_json[i].Total_value ;
+
+ <!-- Logic for determing which icon to use -->
+ if(code_json[i].Payments > 500) {
+
+  var m =  L.marker( [code_json[i].latitude, code_json[i].longitude],{icon: hIcon} )
+      .bindPopup( popup);     }
+
+else if(code_json[i].Payments > 100) {
+
+  var m =  L.marker( [code_json[i].latitude, code_json[i].longitude],{icon: mIcon} )
+      .bindPopup( popup);     }
+
+else {
+
+ var m =   L.marker( [code_json[i].latitude, code_json[i].longitude],{icon: lIcon} )
+      .bindPopup( popup);      
+};
+
+
+  markerClusters.addLayer( m );
+
+   
+}
+
+map.addLayer( markerClusters );
+
+</script>
+
+
+
+
+  
+  </body>
+</html>
+
+
